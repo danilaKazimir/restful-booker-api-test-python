@@ -18,3 +18,21 @@ def ping_api() -> PingApi:
 @pytest.fixture
 def booking_api() -> BookingApi:
     return BookingApi()
+
+
+@pytest.fixture
+def create_successful_booking(booking_api: BookingApi):
+    def _create_successful_booking(missing_field: str = None):
+        if missing_field:
+            booking_api.create_booking(200, missing_field)
+        else:
+            booking_api.create_booking(200)
+
+        booking_api.check_successful_create_booking_responses()
+
+        booking_id = booking_api.get_booking_id()
+
+        booking_api.get_existing_booking(booking_id, 200)
+        booking_api.check_existing_booking_response()
+
+    return _create_successful_booking
