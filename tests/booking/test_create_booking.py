@@ -1,24 +1,14 @@
 import pytest
 
+from tests.conftest import create_successful_booking
+
 
 class TestCreateBooking:
-    def test_successful_booking_create(self, booking_api):
-        booking_api.create_booking(200)
-        booking_api.check_successful_create_booking_responses()
+    def test_successful_booking_create(self, create_successful_booking):
+        create_successful_booking()
 
-        booking_id = booking_api.get_booking_id()
-
-        booking_api.get_existing_booking(booking_id, 200)
-        booking_api.check_existing_booking_response()
-
-    def test_successful_booking_create_without_additional_needs(self, booking_api):
-        booking_api.create_booking(200, 'additionalneeds')
-        booking_api.check_successful_create_booking_responses()
-
-        booking_id = booking_api.get_booking_id()
-
-        booking_api.get_existing_booking(booking_id, 200)
-        booking_api.check_existing_booking_response()
+    def test_successful_booking_create_without_additional_needs(self, create_successful_booking):
+        create_successful_booking('additionalneeds')
 
     @pytest.mark.parametrize('missing_field', [
         'firstname',
