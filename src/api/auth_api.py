@@ -24,4 +24,8 @@ class AuthApi(BaseApi):
 
     def check_invalid_response(self) -> None:
         self._get_response_model(CreateTokenInvalidResponse)
-        self._check_response_field_value('reason', self.__INVALID_RESPONSE_REASON)
+        self._check_response_field_value(
+            'reason',
+            self.__INVALID_RESPONSE_REASON,
+            'Invalid response reason is incorrect!',
+        )

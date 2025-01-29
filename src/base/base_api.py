@@ -45,7 +45,7 @@ class BaseApi:
         assert self._response.status_code == expected_status_code, 'Unexpected status code! ' \
             f'Expected status code - {expected_status_code}, actual status code - {self._response.status_code}'
 
-    def _check_response_field_value(self, field_path: str, expected_value: Any) -> None:
+    def _check_response_field_value(self, field_path: str, expected_value: Any, extra_message: str = None) -> None:
         actual_value = ObjectUtils.get_attr(self._response_model, field_path)
-        assert actual_value == expected_value, f'{field_path} value is incorrect!' \
-            f'Expected {field_path} value = {expected_value}, actual {field_path} value = {actual_value}'
+        assert actual_value == expected_value, f'{extra_message} Expected {field_path} value = {expected_value}, ' \
+            f'actual {field_path} value = {actual_value}'
