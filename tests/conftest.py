@@ -32,7 +32,10 @@ def create_successful_booking(booking_api: BookingApi):
 
         booking_id = booking_api.get_booking_id()
 
-        booking_api.get_existing_booking(booking_id, 200)
+        booking_api.get_booking(booking_id, 200)
         booking_api.check_existing_booking_response()
+
+        booking_api.get_existing_booking_ids(200)
+        booking_api.check_get_booking_ids_response(booking_id)
 
     return _create_successful_booking
