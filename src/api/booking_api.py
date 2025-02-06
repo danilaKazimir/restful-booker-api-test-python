@@ -35,8 +35,11 @@ class BookingApi(BaseApi):
             body=self._request,
         )._check_response_status_code(expected_status_code)
 
-    def update_booking(self, booking_id, expected_status_code: int, token: str = None, auth_header: str = None):
+    def update_booking(self, booking_id, expected_status_code: int, token: str = None, auth_header: str = None,
+                       missing_field: str = None):
         self._request = CreateBookingRequest()
+        if missing_field:
+            ObjectUtils.set_attr(self._request, missing_field, None)
 
         headers = {}
 

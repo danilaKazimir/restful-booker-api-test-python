@@ -4,11 +4,9 @@ from tests.conftest import create_successful_booking
 
 
 class TestCreateBooking:
-    def test_successful_booking_create(self, create_successful_booking):
-        create_successful_booking()
-
-    def test_successful_booking_create_without_additional_needs(self, create_successful_booking):
-        create_successful_booking('additionalneeds')
+    @pytest.mark.parametrize('missing_field', [None, 'additionalneeds'])
+    def test_successful_booking_create(self, create_successful_booking, missing_field):
+        create_successful_booking(missing_field)
 
     @pytest.mark.parametrize('missing_field', [
         'firstname',
