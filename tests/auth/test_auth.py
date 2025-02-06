@@ -5,9 +5,8 @@ class TestAuth:
     VALID_USERNAME = 'admin'
     VALID_PASSWORD = 'password123'
 
-    def test_successful_token_creation(self, auth_api):
-        auth_api.create_token(self.VALID_USERNAME, self.VALID_PASSWORD, 200)
-        auth_api.check_valid_response()
+    def test_successful_token_creation(self, get_auth_token):
+        get_auth_token()
 
     @pytest.mark.parametrize('username,password', [
         ('fake_admin', 'password123'),
