@@ -1,4 +1,4 @@
-from pydantic import BaseModel, RootModel
+from pydantic import BaseModel
 
 from src.models.booking.booking import Booking
 
@@ -6,7 +6,3 @@ from src.models.booking.booking import Booking
 class CreateBookingValidResponse(BaseModel):
     bookingid: int
     booking: Booking
-
-
-class CreateBookingInvalidResponse(RootModel[str]):
-    pass

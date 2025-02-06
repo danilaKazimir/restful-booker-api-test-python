@@ -3,6 +3,7 @@ import pytest
 from src.api.auth_api import AuthApi
 from src.api.ping_api import PingApi
 from src.api.booking_api import BookingApi
+from config import ADMIN_USERNAME, ADMIN_PASSWORD
 
 
 @pytest.fixture
@@ -39,3 +40,12 @@ def create_successful_booking(booking_api: BookingApi):
         booking_api.check_get_booking_ids_response(booking_id)
 
     return _create_successful_booking
+
+
+@pytest.fixture
+def get_auth_token(auth_api):
+    def _get_auth_token():
+        auth_api.create_token(ADMIN_USERNAME, ADMIN_PASSWORD, 200)
+        auth_api.check_valid_response()
+
+    return _get_auth_token

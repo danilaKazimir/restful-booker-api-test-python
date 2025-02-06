@@ -1,4 +1,4 @@
-from typing import TypeVar, Any
+from typing import TypeVar, Any, Mapping
 
 import requests
 from requests import Response
@@ -26,6 +26,12 @@ class BaseApi:
 
     def _post(self, url: str, body: PydanticModel, **kwargs) -> "BaseApi":
         response = requests.post(self.__BASE_URL + url, json=body.model_dump(), **kwargs)
+        self._response = response
+
+        return self
+
+    def _put(self, url: str, body: PydanticModel, headers: Mapping[str, str | bytes | None], **kwargs) -> "BaseApi":
+        response = requests.put(self.__BASE_URL + url, json=body.model_dump(), headers=headers, **kwargs)
         self._response = response
 
         return self
