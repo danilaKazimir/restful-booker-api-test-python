@@ -3,7 +3,7 @@ from src.models.booking.booking import Booking
 from src.models.booking.create_booking_request import CreateBookingRequest
 from src.models.booking.create_booking_response import CreateBookingValidResponse
 from src.models.booking.booking_ids_response import BookingIdsResponse
-from src.models.booking.booking_errors_response import BookingErrorsResponse
+from src.models.booking.booking_root_response import BookingRootResponse
 from src.utils.object_utils import ObjectUtils
 
 
@@ -11,9 +11,11 @@ class BookingApi(BaseApi):
     def __init__(self):
         super().__init__()
         self.__BOOKING_API_URI = '/booking'
-        self.__CREATE_API_ERROR_TEXT = 'Internal Server Error'
-        self.__BOOKING_NOT_FOUND_RESPONSE_TEXT = 'Not Found'
-        self.__BOOKING_FORBIDDEN_RESPONSE_TEXT = 'Forbidden'
+        self.__500_RESPONSE_TEXT = 'Internal Server Error'
+        self.__404_RESPONSE_TEXT = 'Not Found'
+        self.__403_RESPONSE_TEXT = 'Forbidden'
+        self.__201_RESPONSE_TEXT = 'Created'
+        self.__405_RESPONSE_TEXT = 'Method Not Allowed'
         self.__FULL_RESPONSE_ATTRIBUTES = (
             'firstname',
             'lastname',
@@ -35,7 +37,7 @@ class BookingApi(BaseApi):
             body=self._request,
         )._check_response_status_code(expected_status_code)
 
-    def update_booking(self, booking_id, expected_status_code: int, token: str = None, auth_header: str = None,
+    def update_booking(self, booking_id: int, expected_status_code: int, token: str = None, auth_header: str = None,
                        missing_field: str = None):
         self._request = CreateBookingRequest()
         if missing_field:
@@ -59,6 +61,24 @@ class BookingApi(BaseApi):
             headers=headers
         )._check_response_status_code(expected_status_code)
 
+    def delete_booking(self, booking_id: int, expected_status_code: int, token: str = None, auth_header: str = None):
+        headers = {}
+
+        if token:
+            headers.update({
+                'Cookie': f'token={token}'
+            })
+
+        if auth_header:
+            headers.update({
+                'Authorization': f'Basic {auth_header}'
+            })
+
+        return self._delete(
+            url=f'{self.__BOOKING_API_URI}/{booking_id}',
+            headers=headers
+        )._check_response_status_code(expected_status_code)
+
     def get_booking(self, booking_id: int, expected_status_code: int) -> None:
         URL = f'{self.__BOOKING_API_URI}/{booking_id}'
         return self._get(url=URL)._check_response_status_code(expected_status_code)
@@ -79,10 +99,10 @@ class BookingApi(BaseApi):
         self.__check_attributes()
 
     def check_unsuccessful_create_booking_response(self) -> None:
-        self._get_response_model(BookingErrorsResponse)
+        self._get_response_model(BookingRootResponse)
         self._check_response_field_value(
             'root',
-            self.__CREATE_API_ERROR_TEXT,
+            self.__500_RESPONSE_TEXT,
             'Unsuccessful create booking message is incorrect!',
         )
 
@@ -91,19 +111,35 @@ class BookingApi(BaseApi):
         self.__check_if_needed_id_is_exist(booking_id)
 
     def check_not_found_booking_response(self) -> None:
-        self._get_response_model(BookingErrorsResponse)
+        self._get_response_model(BookingRootResponse)
         self._check_response_field_value(
             'root',
-            self.__BOOKING_NOT_FOUND_RESPONSE_TEXT,
+            self.__404_RESPONSE_TEXT,
             'Booking not found message is incorrect!',
         )
 
-    def check_update_forbidden_response(self) -> None:
-        self._get_response_model(BookingErrorsResponse)
+    def check_forbidden_response(self) -> None:
+        self._get_response_model(BookingRootResponse)
         self._check_response_field_value(
             'root',
-            self.__BOOKING_FORBIDDEN_RESPONSE_TEXT,
+            self.__403_RESPONSE_TEXT,
             'Booking forbidden message is incorrect!'
+        )
+
+    def check_delete_successful_response(self) -> None:
+        self._get_response_model(BookingRootResponse)
+        self._check_response_field_value(
+            'root',
+            self.__201_RESPONSE_TEXT,
+            'Booking delete message is incorrect!'
+        )
+
+    def check_delete_unsuccessful_response(self) -> None:
+        self._get_response_model(BookingRootResponse)
+        self._check_response_field_value(
+            'root',
+            self.__405_RESPONSE_TEXT,
+            'Booking delete unsuccessful message is incorrect!'
         )
 
     def __check_request_and_response_attribute_value_equals(self, attribute: str) -> None:
