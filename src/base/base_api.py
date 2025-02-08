@@ -36,6 +36,12 @@ class BaseApi:
 
         return self
 
+    def _delete(self, url: str, headers: Mapping[str, str | bytes | None], **kwargs) -> "BaseApi":
+        response = requests.delete(self.__BASE_URL + url, headers=headers, **kwargs)
+        self._response = response
+
+        return self
+
     def _get_response_model(self, response_model: PydanticModel) -> None:
         try:
             response_data = self._response.json()

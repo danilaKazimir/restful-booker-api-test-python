@@ -1,7 +1,5 @@
 import pytest
 
-from tests.conftest import create_successful_booking
-
 
 class TestCreateBooking:
     @pytest.mark.parametrize('missing_field', [None, 'additionalneeds'])

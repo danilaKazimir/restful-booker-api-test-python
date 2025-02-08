@@ -1,6 +1,5 @@
 import pytest
 
-from tests.conftest import create_successful_booking
 from config import AUTH_BASIC_HEADER
 
 
@@ -31,7 +30,7 @@ class TestUpdateBooking:
         booking_id = booking_api.get_booking_id()
 
         booking_api.update_booking(booking_id, 403)
-        booking_api.check_update_forbidden_response()
+        booking_api.check_forbidden_response()
 
     def test_update_with_invalid_cookie(self, create_successful_booking, booking_api):
         create_successful_booking()
@@ -39,7 +38,7 @@ class TestUpdateBooking:
         booking_id = booking_api.get_booking_id()
 
         booking_api.update_booking(booking_id, 403, token='invalid_token')
-        booking_api.check_update_forbidden_response()
+        booking_api.check_forbidden_response()
 
     def test_update_with_invalid_header(self, create_successful_booking, booking_api):
         create_successful_booking()
@@ -47,7 +46,7 @@ class TestUpdateBooking:
         booking_id = booking_api.get_booking_id()
 
         booking_api.update_booking(booking_id, 403, auth_header='invalid_headers')
-        booking_api.check_update_forbidden_response()
+        booking_api.check_forbidden_response()
 
     @pytest.mark.parametrize('missing_field', [
         'firstname',
