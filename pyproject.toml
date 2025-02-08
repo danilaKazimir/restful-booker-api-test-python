@@ -11,6 +11,7 @@ requests = "^2.32.3"
 pydantic = "^2.10.6"
 pytest = "^8.3.4"
 faker = "^35.0.0"
+deepdiff = "^8.2.0"
 
 
 [build-system]

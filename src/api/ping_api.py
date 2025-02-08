@@ -1,3 +1,7 @@
+from typing import TypeVar
+
+from pydantic import BaseModel
+
 from src.base.base_api import BaseApi
 from src.models.health_check.health_check_response import HealthCheckResponse
 
@@ -8,13 +12,13 @@ class PingApi(BaseApi):
         self.__PING_API_URI = '/ping'
         self.__PING_SUCCESS_MESSAGE = 'Created'
 
-    def ping_request(self, expected_status_code: int) -> None:
-        return self._get(url=self.__PING_API_URI)._check_response_status_code(expected_status_code)
+    PydanticModel = TypeVar('PydanticModel', bound=BaseModel)
 
-    def check_ping_response(self) -> None:
-        self._get_response_model(HealthCheckResponse)
-        self._check_response_field_value(
-            'root',
-            self.__PING_SUCCESS_MESSAGE,
-            'Ping success message is incorrect!',
-        )
+    def ping_request(self, expected_status_code: int) -> PydanticModel:
+        return self._get(
+            url=self.__PING_API_URI
+        )._check_response_status_code(expected_status_code)._get_response_model(HealthCheckResponse)
+
+    def check_ping_response(self, response: HealthCheckResponse) -> None:
+        assert response.root == self.__PING_SUCCESS_MESSAGE, f'Ping success message is incorrect! \
+            Expected value - {self.__PING_SUCCESS_MESSAGE}, actual value - {response.root}'

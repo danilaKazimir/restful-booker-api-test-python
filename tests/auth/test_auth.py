@@ -1,12 +1,12 @@
 import pytest
 
+from config import ADMIN_USERNAME, ADMIN_PASSWORD
+from src.models.create_token.create_token_response import CreateTokenValidResponse, CreateTokenInvalidResponse
+
 
 class TestAuth:
-    VALID_USERNAME = 'admin'
-    VALID_PASSWORD = 'password123'
-
-    def test_successful_token_creation(self, get_auth_token):
-        get_auth_token()
+    def test_successful_token_creation(self, auth_api):
+        auth_api.create_token(ADMIN_USERNAME, ADMIN_PASSWORD, 200, CreateTokenValidResponse)
 
     @pytest.mark.parametrize('username,password', [
         ('fake_admin', 'password123'),
@@ -17,5 +17,5 @@ class TestAuth:
         (None, None)
     ])
     def test_unsuccessful_token_creation(self, auth_api, username, password):
-        auth_api.create_token(username, password, 200)
-        auth_api.check_invalid_response()
+        response = auth_api.create_token(username, password, 200, CreateTokenInvalidResponse)
+        auth_api.check_invalid_response(response)

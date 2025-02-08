@@ -1,66 +1,61 @@
 import pytest
 
 from config import AUTH_BASIC_HEADER
+from src.models.booking.booking_root_response import BookingRootResponse
+from src.models.booking.booking import Booking
 
 
 class TestUpdateBooking:
-    @pytest.mark.parametrize('missing_field', [None, 'additionalneeds'])
-    def test_successful_update_with_token(self, create_successful_booking, get_auth_token, booking_api, auth_api, missing_field):
-        create_successful_booking()
-        get_auth_token()
+    def test_successful_update_with_token(self, created_booking, auth_token, booking_api):
+        request = Booking().fill_data()
+        # TODO add test with put request without additionalneeds
+        # if missing_field:
+        #     setattr(request, missing_field, None)
 
-        booking_id = booking_api.get_booking_id()
-        token = auth_api.get_token()
+        response = booking_api.update_booking(request, created_booking, 200, Booking, token=auth_token)
+        booking_api.check_existing_booking_response(response, request)
 
-        booking_api.update_booking(booking_id, 200, token=token, missing_field=missing_field)
-        booking_api.check_existing_booking_response()
+    def test_successful_update_with_auth_header(self, created_booking, booking_api):
+        request = Booking().fill_data()
+        # TODO add test with put request without additionalneeds
+        # if missing_filed:
+        #     setattr(request, missing_filed, None)
 
-    @pytest.mark.parametrize('missing_filed', [None, 'additionalneeds'])
-    def test_successful_update_with_auth_header(self, create_successful_booking, get_auth_token, booking_api, missing_filed):
-        create_successful_booking()
+        response = booking_api.update_booking(request, created_booking, 200, Booking, auth_header=AUTH_BASIC_HEADER)
 
-        booking_id = booking_api.get_booking_id()
+        booking_api.check_existing_booking_response(response, request)
 
-        booking_api.update_booking(booking_id, 200, auth_header=AUTH_BASIC_HEADER, missing_field=missing_filed)
-        booking_api.check_existing_booking_response()
+    def test_update_without_auth_keys(self, created_booking, booking_api):
+        request = Booking().fill_data()
+        response = booking_api.update_booking(request, created_booking, 403, BookingRootResponse)
+        booking_api.check_forbidden_response(response)
 
-    def test_update_without_auth_keys(self, create_successful_booking, get_auth_token, booking_api):
-        create_successful_booking()
+    def test_update_with_invalid_cookie(self, created_booking, booking_api):
+        request = Booking().fill_data()
+        response = booking_api.update_booking(request, created_booking, 403, BookingRootResponse, token='invalid_token')
+        booking_api.check_forbidden_response(response)
 
-        booking_id = booking_api.get_booking_id()
-
-        booking_api.update_booking(booking_id, 403)
-        booking_api.check_forbidden_response()
-
-    def test_update_with_invalid_cookie(self, create_successful_booking, booking_api):
-        create_successful_booking()
-
-        booking_id = booking_api.get_booking_id()
-
-        booking_api.update_booking(booking_id, 403, token='invalid_token')
-        booking_api.check_forbidden_response()
-
-    def test_update_with_invalid_header(self, create_successful_booking, booking_api):
-        create_successful_booking()
-
-        booking_id = booking_api.get_booking_id()
-
-        booking_api.update_booking(booking_id, 403, auth_header='invalid_headers')
-        booking_api.check_forbidden_response()
+    def test_update_with_invalid_header(self, created_booking, booking_api):
+        request = Booking().fill_data()
+        response = booking_api.update_booking(request, created_booking, 403, BookingRootResponse,
+                                              auth_header='invalid_header')
+        booking_api.check_forbidden_response(response)
 
     @pytest.mark.parametrize('missing_field', [
         'firstname',
         'lastname',
         'totalprice',
         'depositpaid',
-        'bookingdates.checkin',
-        'bookingdates.checkout'
+        'checkin',
+        'checkout'
     ])
-    def test_update_without_needed_field(self, create_successful_booking, get_auth_token, booking_api, auth_api, missing_field):
-        create_successful_booking()
-        get_auth_token()
+    def test_update_without_needed_field(self, created_booking, booking_api, auth_api, missing_field):
+        request = Booking().fill_data()
+        if missing_field and missing_field not in ['checkin', 'checkout']:
+            setattr(request, missing_field, None)
+        elif missing_field and missing_field in ['checkin', 'checkout']:
+            setattr(request.bookingdates, missing_field, None)
 
-        booking_id = booking_api.get_booking_id()
-        token = auth_api.get_token()
-
-        booking_api.update_booking(booking_id, 400, token=token, missing_field=missing_field)
+        response = booking_api.update_booking(request, created_booking, 400, BookingRootResponse,
+                                              auth_header=AUTH_BASIC_HEADER)
+        booking_api.check_bad_request_response(response)
