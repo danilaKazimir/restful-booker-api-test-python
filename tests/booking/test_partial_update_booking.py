@@ -1,4 +1,5 @@
 import pytest
+import allure
 
 from config import AUTH_BASIC_HEADER
 from src.models.booking.booking import Booking
@@ -6,6 +7,10 @@ from src.utils.object_utils import ObjectUtils
 
 
 class TestPartialUpdateBooking:
+    @allure.feature('Booking API')
+    @allure.story('Partial update booking')
+    @allure.title('Update existing booking with authentication token')
+    @allure.description('Check that booking is successfully updated (with authentication token)')
     @pytest.mark.parametrize('updated_field', [
         ['firstname'],
         ['lastname'],
@@ -46,6 +51,10 @@ class TestPartialUpdateBooking:
 
         booking_api.check_existing_booking_response(update_response, booking_values_after_update)
 
+    @allure.feature('Booking API')
+    @allure.story('Partial update booking')
+    @allure.title('Update existing booking with authentication basic header')
+    @allure.description('Check that booking is successfully updated (with authentication basic header)')
     @pytest.mark.parametrize('updated_field', [
         ['firstname'],
         ['lastname'],
