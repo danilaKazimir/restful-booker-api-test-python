@@ -1,4 +1,5 @@
 import pytest
+import allure
 
 from src.models.booking.booking import Booking
 from src.models.booking.booking_root_response import BookingRootResponse
@@ -7,6 +8,10 @@ from src.models.booking.create_booking_response import CreateBookingResponse
 
 class TestCreateBooking:
     @pytest.mark.parametrize('missing_field', [None, 'additionalneeds'])
+    @allure.feature('Booking API')
+    @allure.story('Create booking')
+    @allure.title('Create new booking')
+    @allure.description('Check that booking is successfully created')
     def test_successful_booking_create(self, booking_api, missing_field):
         create_booking_request = Booking().fill_data()
         if missing_field:
@@ -29,6 +34,10 @@ class TestCreateBooking:
         'checkin',
         'checkout'
     ])
+    @allure.feature('Booking API')
+    @allure.story('Create booking')
+    @allure.title('Check required field in creation request')
+    @allure.description('Check that booking is not created, if required field is missing')
     def test_create_booking_with_missing_required_field(self, booking_api, missing_field):
         request = Booking().fill_data()
         if missing_field and missing_field not in ['checkin', 'checkout']:
